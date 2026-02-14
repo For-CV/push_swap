@@ -12,61 +12,111 @@
 
 #include "push_swap.h"
 
-void	ft_rev_rot_a(t_list **stack)
+void	rrr(t_list **stack_a, t_list **stack_b)
 {
 	t_list	*last;
-	t_list	*node;
+	t_list	*before_last;
 
-	if (!*stack || !(*stack)-> next)
-		return ;
-	node = *stack;
-	while (node && node -> next && (node -> next)-> next)
-		node = node -> next;
-	last = node -> next;
-	node -> next = NULL;
-	last -> next = *stack;
-	*stack = last;
-	write(1, "rra\n", 4);
-	return ;
-}
-
-void	ft_rev_rot_b(t_list **stack)
-{
-	t_list	*last;
-	t_list	*node;
-
-	if (!*stack || !(*stack)-> next)
-		return ;
-	node = *stack;
-	while (node && node -> next && (node -> next)-> next)
-		node = node -> next;
-	last = node -> next;
-	node -> next = NULL;
-	last -> next = *stack;
-	*stack = last;
-	write(1, "rrb\n", 4);
-	return ;
+	if (stack_a && *stack_a && (*stack_a)->next)
+	{
+		last = *stack_a;
+		while (last->next)
+		{
+			before_last = last;
+			last = last->next;
+		}
+		before_last->next = NULL;
+		last->next = *stack_a;
+		*stack_a = last;
+	}
+	if (stack_b && *stack_b && (*stack_b)->next)
+	{
+		last = *stack_b;
+		while (last->next)
+		{
+			before_last = last;
+			last = last->next;
+		}
+		before_last->next = NULL;
+		last->next = *stack_b;
+		*stack_b = last;
+	}
+	write(1, "rrr\n", 4);
 }
 
 int	ft_rep_content(t_list *stack)
 {
-	t_list	*start;
-	int		content;
+	t_list	*i;
+	t_list	*j;
 
-	if (!stack)
-		return (0);
-	content = *(int *)stack->content;
-	start = stack;
+	i = stack;
+	while (i)
+	{
+		j = i->next;
+		while (j)
+		{
+			if ((long)i->content == (long)j->content)
+				return (1);
+			j = j->next;
+		}
+		i = i->next;
+	}
+	return (0);
+}
+
+t_list	*ft_find_min(t_list *list)
+{
+	t_list	*min_node;
+	long	min_val;
+
+	if (!list)
+		return (NULL);
+	min_node = list;
+	min_val = (long)list->content;
+	while (list)
+	{
+		if ((long)list->content < min_val)
+		{
+			min_val = (long)list->content;
+			min_node = list;
+		}
+		list = list->next;
+	}
+	return (min_node);
+}
+
+t_list	*ft_find_max(t_list *list)
+{
+	t_list	*max_node;
+	long	max_val;
+
+	if (!list)
+		return (NULL);
+	max_node = list;
+	max_val = (long)list->content;
+	while (list)
+	{
+		if ((long)list->content > max_val)
+		{
+			max_val = (long)list->content;
+			max_node = list;
+		}
+		list = list->next;
+	}
+	return (max_node);
+}
+
+int	ft_get_pos(t_list *stack, t_list *node)
+{
+	int	pos;
+
+	pos = 0;
 	while (stack)
 	{
+		if (stack == node)
+			return (pos);
 		stack = stack->next;
-		if (stack && content == *(int *)stack->content)
-			return (1);
+		pos++;
 	}
-	start = start->next;
-	if (!start)
-		return (0);
-	if (ft_rep_content(start))
-		return (1);
-	return (0);
+	return (-1);
 }

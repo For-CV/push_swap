@@ -12,105 +12,121 @@
 
 #include "push_swap.h"
 
-t_list	*ft_find_node_target_b(t_list *node, t_list *stack)
+int	ft_get_target_pos_in_b(t_list *stack_b, int content_a)
 {
-	t_list	*r;
-	t_list	*start;
-	int		closest;
-	int		content;
-	int		content_a;
+	int		pos;
+	int		target_pos;
+	long	closest_smaller;
+	t_list	*curr;
 
-	if (!node || !stack)
-		return (NULL);
-	closest = INT_MAX;
-	content = *(int *)node -> content;
-	r = NULL;
-	start = stack;
-	while (stack)
-	{
-		content_a = *(int *)stack -> content;
-		if (content_a > content && content_a < closest)
-		{
-			r = stack;
-			closest = content_a;
-		}
-		stack = stack -> next;
-	}
-	if (!r)
-		r = ft_find_min(start);
-	return (r);
-}
-
-t_list	*ft_find_node_target_a(t_list *node, t_list *stack)
-{
-	t_list	*r;
-	int		closest;
-	int		content;
-	int		content_b;
-
-	if (!node || !stack)
-		return (NULL);
-	closest = INT_MIN;
-	content = *(int *)node -> content;
-	r = stack;
-	while (stack)
-	{
-		content_b = *(int *)stack -> content;
-		if (content_b < content && content_b > closest)
-		{
-			r = stack;
-			closest = content_b;
-		}
-		stack = stack -> next;
-	}
-	if (!r)
-		r = ft_find_max(stack);
-	return (r);
-}
-
-t_list	*ft_find_b_target(t_list *node, t_list *stack)
-{
-	t_list	*r;
-	int		closest;
-	int		content;
-	int		content_a;
-
-	if (!node || !stack)
-		return (NULL);
-	closest = INT_MAX;
-	content = *(int *)node -> content;
-	r = NULL;
-	while (stack)
-	{
-		content_a = *(int *)stack -> content;
-		if (content_a < content && content_a < closest)
-		{
-			r = stack;
-			closest = content_a;
-		}
-		stack = stack -> next;
-	}
-	return (r);
-}
-
-int	ft_choose_op(t_list *stack, t_list *node)
-{
-	int	size;
-	int	pos;
-
-	if (!stack)
-		return (INT_MIN);
 	pos = 0;
-	size = ft_lstsize(stack);
-	while (stack)
+	target_pos = 0;
+	closest_smaller = LONG_MIN;
+	curr = stack_b;
+	while (curr)
 	{
-		if (*(int *)stack -> content == *(int *)node -> content)
-			break ;
+		if ((long)curr->content < (long)content_a && (long)curr->content > closest_smaller)
+		{
+			closest_smaller = (long)curr->content;
+			target_pos = pos;
+		}
+		curr = curr->next;
 		pos++;
-		stack = stack -> next;
 	}
-	if (pos <= (size / 2))
-		return (pos);
-	pos = size - pos;
-	return (-pos);
+	if (closest_smaller == LONG_MIN)
+		return (ft_get_pos(stack_b, ft_find_max(stack_b)));
+	return (target_pos);
+}
+
+static void	ft_apply_rotations(t_list **a, t_list **b, int pos_a, int pos_b)
+{
+	int	size_a;
+	int	size_b;
+
+	size_a = ft_lstsize(*a);
+	size_b = ft_lstsize(*b);
+	if (pos_a <= size_a / 2 && pos_b <= size_b / 2)
+	{
+		while (pos_a > 0 && pos_b > 0 && pos_a-- && pos_b--)
+			rr(a, b);
+		while (pos_a-- > 0)
+			ra(a);
+		while (pos_b-- > 0)
+			rb(b);
+	}
+	else if (pos_a > size_a / 2 && pos_b > size_b / 2)
+	{
+		while (pos_a < size_a && pos_b < size_b && pos_a++ && pos_b++)
+			rrr(a, b);
+		while (pos_a++ < size_a)
+			rra(a);
+		while (pos_b++ < size_b)
+			rrb(b);
+	}
+	else if (pos_a <= size_a / 2)
+	{
+		while (pos_a-- > 0)
+			ra(a);
+		while (pos_b++ < size_b)
+			rrb(b);
+	}
+	else
+	{
+		while (pos_a++ < size_a)
+			rra(a);
+		while (pos_b-- > 0)
+			rb(b);
+	}
+}
+
+static long	ft_calculate_cost(int pos_a, int pos_b, int size_a, int size_b)
+{
+	long	cost_up;
+	long	cost_down;
+	long	cost_mixed1;
+	long	cost_mixed2;
+	long	min;
+
+	cost_up = (pos_a > pos_b) ? pos_a : pos_b;
+	cost_down = ((size_a - pos_a) > (size_b - pos_b)) ? (size_a - pos_a) : (size_b - pos_b);
+	cost_mixed1 = pos_a + (size_b - pos_b);
+	cost_mixed2 = (size_a - pos_a) + pos_b;
+	min = cost_up;
+	if (cost_down < min)
+		min = cost_down;
+	if (cost_mixed1 < min)
+		min = cost_mixed1;
+	if (cost_mixed2 < min)
+		min = cost_mixed2;
+	return (min);
+}
+
+void	ft_move_cheapest_to_b(t_list **a, t_list **b)
+{
+	t_list	*curr;
+	int		pos_a;
+	int		best_a;
+	int		best_b;
+	long	min_cost;
+	long	cost;
+	int		target_pos_b;
+
+	curr = *a;
+	pos_a = 0;
+	min_cost = LONG_MAX;
+	while (curr)
+	{
+		target_pos_b = ft_get_target_pos_in_b(*b, (long)curr->content);
+		cost = ft_calculate_cost(pos_a, target_pos_b, ft_lstsize(*a), ft_lstsize(*b));
+		if (cost < min_cost)
+		{
+			min_cost = cost;
+			best_a = pos_a;
+			best_b = target_pos_b;
+		}
+		curr = curr->next;
+		pos_a++;
+	}
+	ft_apply_rotations(a, b, best_a, best_b);
+	pb(b, a);
 }

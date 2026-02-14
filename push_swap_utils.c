@@ -12,76 +12,82 @@
 
 #include "push_swap.h"
 
-void	ft_swap_a(t_list **stack)
+void	sa(t_list **stack_a)
 {
-	t_list	*node;
+	t_list	*first;
+	t_list	*second;
 
-	if (!*stack || !(*stack)-> next)
+	if (!stack_a || !*stack_a || !(*stack_a)->next)
 		return ;
-	node = (*stack)-> next;
-	(*stack)-> next = node -> next;
-	node -> next = *stack;
-	*stack = node;
+	first = *stack_a;
+	second = first->next;
+	first->next = second->next;
+	second->next = first;
+	*stack_a = second;
 	write(1, "sa\n", 3);
-	return ;
 }
 
-void	ft_swap_b(t_list **stack)
+void	sb(t_list **stack_b)
 {
-	t_list	*node;
+	t_list	*first;
+	t_list	*second;
 
-	if (!*stack || !(*stack)-> next)
+	if (!stack_b || !*stack_b || !(*stack_b)->next)
 		return ;
-	node = (*stack)-> next;
-	(*stack)-> next = node -> next;
-	node -> next = *stack;
-	*stack = node;
+	first = *stack_b;
+	second = first->next;
+	first->next = second->next;
+	second->next = first;
+	*stack_b = second;
 	write(1, "sb\n", 3);
-	return ;
 }
 
-void	ft_swap_s(t_list **stack_a, t_list **stack_b)
+void	ss(t_list **stack_a, t_list **stack_b)
 {
-	t_list	*node;
+	t_list	*first;
+	t_list	*second;
 
-	if (!*stack_a || !(*stack_a)-> next || !*stack_b || !(*stack_b)-> next)
-		return ;
-	node = (*stack_a)-> next;
-	(*stack_a)-> next = node -> next;
-	node -> next = *stack_a;
-	*stack_a = node;
-	node = (*stack_b)-> next;
-	(*stack_b)-> next = node -> next;
-	node -> next = *stack_b;
-	*stack_b = node;
+	if (stack_a && *stack_a && (*stack_a)->next)
+	{
+		first = *stack_a;
+		second = first->next;
+		first->next = second->next;
+		second->next = first;
+		*stack_a = second;
+	}
+	if (stack_b && *stack_b && (*stack_b)->next)
+	{
+		first = *stack_b;
+		second = first->next;
+		first->next = second->next;
+		second->next = first;
+		*stack_b = second;
+	}
 	write(1, "ss\n", 3);
-	return ;
 }
 
-void	ft_push_a(t_list **stack_b, t_list **stack_a)
+void	pa(t_list **stack_a, t_list **stack_b)
 {
-	t_list	*t;
+	t_list	*tmp;
 
-	if (!*stack_b)
+	if (!stack_b || !*stack_b)
 		return ;
-	t = *stack_b;
-	*stack_b = t -> next;
-	t -> next = *stack_a;
-	*stack_a = t;
+	tmp = *stack_b;
+	*stack_b = tmp->next;
+	tmp->next = *stack_a;
+	*stack_a = tmp;
 	write(1, "pa\n", 3);
-	return ;
 }
 
-void	ft_push_b(t_list **stack_a, t_list **stack_b)
+void	pb(t_list **stack_b, t_list **stack_a)
 {
-	t_list	*t;
+	t_list	*tmp;
 
-	if (!*stack_a)
+	if (!stack_a || !*stack_a)
 		return ;
-	t = *stack_a;
-	*stack_a = t -> next;
-	t -> next = *stack_b;
-	*stack_b = t;
+	tmp = *stack_a;
+	*stack_a = tmp->next;
+	tmp->next = *stack_b;
+	*stack_b = tmp;
 	write(1, "pb\n", 3);
-	return ;
 }

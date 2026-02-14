@@ -12,97 +12,96 @@
 
 #include "push_swap.h"
 
-int	ft_push_swap_b(t_list **stack_a, t_list **stack_b)
+void	ra(t_list **stack_a)
 {
-	int	op;
+	t_list	*first;
+	t_list	*last;
 
-	if (!stack_a || !stack_b || !*stack_a || !*stack_b)
-		return (1);
-	op = 0;
-	while (ft_lstsize(*stack_b) > 0)
+	if (!stack_a || !*stack_a || !(*stack_a)->next)
+		return ;
+	first = *stack_a;
+	*stack_a = first->next;
+	last = ft_lstlast(*stack_a);
+	last->next = first;
+	first->next = NULL;
+	write(1, "ra\n", 3);
+}
+
+void	rb(t_list **stack_b)
+{
+	t_list	*first;
+	t_list	*last;
+
+	if (!stack_b || !*stack_b || !(*stack_b)->next)
+		return ;
+	first = *stack_b;
+	*stack_b = first->next;
+	last = ft_lstlast(*stack_b);
+	last->next = first;
+	first->next = NULL;
+	write(1, "rb\n", 3);
+}
+
+void	rr(t_list **stack_a, t_list **stack_b)
+{
+	t_list	*first;
+	t_list	*last;
+
+	if (stack_a && *stack_a && (*stack_a)->next)
 	{
-		ft_choose_target_b(stack_b, stack_a, INT_MAX);
-		ft_push_a(stack_b, stack_a);
+		first = *stack_a;
+		*stack_a = first->next;
+		last = ft_lstlast(*stack_a);
+		last->next = first;
+		first->next = NULL;
 	}
-	op = ft_choose_op(*stack_a, ft_find_min(*stack_a));
-	ft_rot_cost(op, 0, stack_a, stack_a);
-	return (0);
+	if (stack_b && *stack_b && (*stack_b)->next)
+	{
+		first = *stack_b;
+		*stack_b = first->next;
+		last = ft_lstlast(*stack_b);
+		last->next = first;
+		first->next = NULL;
+	}
+	write(1, "rr\n", 3);
 }
 
-void	ft_rotate_a(t_list **stack)
-{
-	t_list	*t;
-	t_list	*start;
-
-	if (!*stack || !(*stack)-> next)
-		return ;
-	start = *stack;
-	*stack = start -> next;
-	t = ft_lstlast(*stack);
-	t -> next = start;
-	start -> next = NULL;
-	write(1, "ra\n", 4);
-	return ;
-}
-
-void	ft_rotate_b(t_list **stack)
-{
-	t_list	*t;
-	t_list	*start;
-
-	if (!*stack || !(*stack)-> next)
-		return ;
-	start = *stack;
-	*stack = start -> next;
-	t = ft_lstlast(*stack);
-	t -> next = start;
-	start -> next = NULL;
-	write(1, "rb\n", 4);
-	return ;
-}
-
-void	ft_rotate_r(t_list **stack_a, t_list **stack_b)
-{
-	t_list	*t;
-	t_list	*start;
-
-	if (!*stack_a || !(*stack_a)-> next || !*stack_b || !(*stack_b)-> next)
-		return ;
-	start = *stack_a;
-	*stack_a = start -> next;
-	t = ft_lstlast(*stack_a);
-	t -> next = start;
-	start -> next = NULL;
-	start = *stack_b;
-	*stack_b = start -> next;
-	t = ft_lstlast(*stack_b);
-	t -> next = start;
-	start -> next = NULL;
-	write(1, "rr\n", 4);
-	return ;
-}
-
-void	ft_rev_rot_r(t_list **stack_a, t_list **stack_b)
+void	rra(t_list **stack_a)
 {
 	t_list	*last;
-	t_list	*node;
+	t_list	*before_last;
 
-	if (!*stack_a || !(*stack_a)-> next || !*stack_b || !(*stack_b)-> next)
+	if (!stack_a || !*stack_a || !(*stack_a)->next)
 		return ;
-	node = *stack_a;
-	while (node && node -> next && (node -> next)-> next)
-		node = node -> next;
-	last = node -> next;
-	node -> next = NULL;
-	last -> next = *stack_a;
+	last = *stack_a;
+	before_last = NULL;
+	while (last->next)
+	{
+		before_last = last;
+		last = last->next;
+	}
+	before_last->next = NULL;
+	last->next = *stack_a;
 	*stack_a = last;
-	node = *stack_b;
-	while (node && node -> next && (node -> next)-> next)
-		node = node -> next;
-	last = node -> next;
-	node -> next = NULL;
-	last -> next = *stack_b;
+	write(1, "rra\n", 4);
+}
+
+void	rrb(t_list **stack_b)
+{
+	t_list	*last;
+	t_list	*before_last;
+
+	if (!stack_b || !*stack_b || !(*stack_b)->next)
+		return ;
+	last = *stack_b;
+	before_last = NULL;
+	while (last->next)
+	{
+		before_last = last;
+		last = last->next;
+	}
+	before_last->next = NULL;
+	last->next = *stack_b;
 	*stack_b = last;
-	write(1, "rrr\n", 4);
-	return ;
+	write(1, "rrb\n", 4);
 }
